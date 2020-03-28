@@ -2,7 +2,10 @@
 
 This is a graph widget for HADashboard that uses plot.ly as the graph engine for plotting data from the HA Nordpool integration.
 
+The graph shows the price for today and tomorrow (when available), and is colorized to reflect low or high current price.
+
 Features:
+
 
 To use it, you need to:
 1. Make sure you have configured the nordpool integration in Home Assistant https://github.com/custom-components/nordpool
@@ -19,11 +22,11 @@ np:
     units:  "Öre/kWh"   # The unit_of_measurement for your sensors/entities
     title: "Elpris"  # Widget title
     fill: "tozeroy" # options are  "none" | "tozeroy" | "tozerox" | "tonexty" | "tonextx" | "toself" 
+    always_low: 10 # Everything below this is always considered low price
 ````
 
 6. Add the widget to your dashboard.yaml file. 
 
+---
 Based on code from  
-![HADashboard-widgets](https://github.com/tjntomas/HADashboard-widgets)
-which is Copyright (c) 2018 Tomas Jansson
-and also includes the Plotly.js library, Copyright Plotly Inc.
+[HADashboard-widgets](https://github.com/tjntomas/HADashboard-widgets), which is Copyright (c) 2018 Tomas Jansson and also includes the Plotly.js library, Copyright Plotly Inc.

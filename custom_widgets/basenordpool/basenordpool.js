@@ -43,8 +43,14 @@ function basenordpool(widget_id, url, skin, parameters)
 	self.index = 1
 	self.low_price = false
 	self.TomorrowAvailable = false;
+	self.always_low = 0
 
-	setInterval(Plot, 5000, self);
+	if ('always_low' in self.parameters)
+	{
+		self.always_low = Number(self.parameters.always_low)
+	}
+
+	setInterval(Plot, 60000, self);
 
 	function OnStateUpdate(self, state){
 		// Log that new data has been received.
@@ -123,7 +129,8 @@ showticklabels: true
 		  		 }
 		var now = new Date()
 		var current_time = now.getHours() + now.getMinutes()/60.0
-		if (self.low_price)
+		var price = self.DataSeriesArray[1][now.getHours()]
+		if (self.low_price || (self.always_low > 1 && price < self.always_low))
 		{
 			var colorIndex = 0
 		}
@@ -131,7 +138,6 @@ showticklabels: true
 		{
 			var colorIndex = 1
 		}
-		var price = self.DataSeriesArray[1][now.getHours()]
 		var display = {
 					margin: { t:32,l: 15, r: 5 , b: 30 },
 					titlefont: {"size": 12,"color": self.TITLE_COLOR, "font-weight":500},
@@ -228,6 +234,7 @@ showticklabels: true
 		var today = state.attributes.today
 		var tomorrow = state.attributes.tomorrow
 		self.low_price = state.attributes["low price"]
+
 		self.DataSeriesArray[0] = new Array()
 		self.DataSeriesArray[1] = new Array()
 
