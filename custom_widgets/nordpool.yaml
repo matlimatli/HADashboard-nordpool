@@ -1,0 +1,9 @@
+widget_type: basenordpool
+entity: "{{entity}}"
+fields: []
+static_css:
+  widget_style: $icon_widget_style
+css: [] 
+
+icons: []
+static_icons: []
