@@ -5,7 +5,9 @@ function basenordpool(widget_id, url, skin, parameters)
 	self.parameters = parameters
 	self.OnStateAvailable = OnStateAvailable
 	self.OnStateUpdate = OnStateUpdate
+	self.ExchangeUpdate = ExchangeUpdate
 	self.states = {}
+	self.data_received = false
 	var l = Object.keys(self.parameters.entities).length
 	var callbacks = []
 	var monitored_entities =  []
@@ -13,6 +15,11 @@ function basenordpool(widget_id, url, skin, parameters)
 	for (entity of self.parameters.entities){
 		monitored_entities.push({"entity": entity, "initial": self.OnStateAvailable, "update": self.OnStateUpdate})
 	}
+	self.exchange_rate = 1.0
+	if ('exchange_rate' in self.parameters)
+	{
+		monitored_entities.push({"entity": self.parameters.exchange_rate, "initial": self.ExchangeUpdate, "update": self.ExchangeUpdate})	
+	}	
 	
 		// Some default values
 	self.PAPER_BACKGROUND_COLOR = 'rgba(200,200,200,0)'
@@ -50,7 +57,22 @@ function basenordpool(widget_id, url, skin, parameters)
 		self.always_low = Number(self.parameters.always_low)
 	}
 
+
 	setInterval(Plot, 60000, self);
+
+	function ExchangeUpdate(self, state){
+		// Log that new data has been received.
+		self.exchange_rate = parseFloat(state.state)
+		if (isNaN(self.exchange_rate))
+		{
+			self.exchange_rate = 1.0
+		}
+		Logger(self,"Exchange rate upd: " + self.exchange_rate)
+		if (self.data_received)
+		{
+			Plot(self)
+		}
+	}
 
 	function OnStateUpdate(self, state){
 		// Log that new data has been received.
@@ -129,7 +151,7 @@ showticklabels: true
 		  		 }
 		var now = new Date()
 		var current_time = now.getHours() + now.getMinutes()/60.0
-		var price = self.DataSeriesArray[1][now.getHours()]
+		var price = self.DataSeriesArray[1][now.getHours()] * self.exchange_rate
 		if (self.low_price || (self.always_low > 1 && price < self.always_low))
 		{
 			var colorIndex = 0
@@ -211,10 +233,11 @@ showticklabels: true
 
 		d_shape = Settings(self,'shape','hv')
 		d_fill = Settings(self,'fill','')
+		var scaledArray = self.DataSeriesArray[1].map(x => x*self.exchange_rate)
 		traces[0] = {
 			type: "scatter",
 			x: self.DataSeriesArray[0],
-			y: self.DataSeriesArray[1],
+			y: scaledArray,
 			mode: 'lines', line:{
 									color: traceColors[colorIndex],
 									width: 2,shape: d_shape},
@@ -234,7 +257,8 @@ showticklabels: true
 		var today = state.attributes.today
 		var tomorrow = state.attributes.tomorrow
 		self.low_price = state.attributes["low price"]
-
+		self.data_received = true;
+		
 		self.DataSeriesArray[0] = new Array()
 		self.DataSeriesArray[1] = new Array()
 
