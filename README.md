@@ -6,6 +6,11 @@ The graph shows the price for today and tomorrow (when available), and is colori
 
 Features:
 
+Show the current day electricity price in a graph. If tomorrow's prices are available, display them too.
+
+If the price is above the daily average and above a set limit, the graph will be colored red. Otherwise green.
+
+The prices are (currently) in EUR. If another currency is desired, use the exchange_rate parameter, which will use a HA sensor contining the exchange rate to your current. 
 
 To use it, you need to:
 1. Make sure you have configured the nordpool integration in Home Assistant https://github.com/custom-components/nordpool
@@ -22,6 +27,7 @@ np:
     units:  "Öre/kWh"   # The unit_of_measurement for your sensors/entities
     title: "Elpris"  # Widget title
     fill: "tozeroy" # options are  "none" | "tozeroy" | "tozerox" | "tonexty" | "tonextx" | "toself" 
+    exchange_rate: sensor.exchange_rate # optional, if you want to scale the price with a currency exchange rate
     always_low: 10 # Everything below this is always considered low price
 ````
 
